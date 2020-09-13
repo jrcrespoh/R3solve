@@ -1,36 +1,35 @@
-let addCategory = function (data) {
-  const collection = firebase.firestore().collection('categories');
+let addData = function (data, collecxn) {
+  const collection = firebase.firestore().collection(collecxn.toString());
   return collection.add(data);
 };
 
-let getAllCategories = function (render) {
+let getNDocuments = function (collection, n, process) {
   const query = firebase.firestore()
-    .collection('categories')
-    .orderBy('count', 'desc')
-    .limit(5);
-  this.getDocumentsInQuery(query, render);
+    .collection(collection.toString())
+    .limit(n);
+  getDocumentsInQuery(query, process);
 };
 
-let getDocumentsInQuery = function (query, render) {
+let getDocumentsInQuery = function (query, process) {
   query.onSnapshot((snapshot) => {
     if (!snapshot.size) {
-      return render();
+      return process();
     }
 
     snapshot.docChanges().forEach((change) => {
       if (change.type === 'added' || change.type === 'modified') {
-        render(change.doc);
+        process(change.doc);
       }
     });
   });
 };
 
-let getCategory = function (id) {
-  return firebase.firestore().collection('categories').doc(id).get();
+let getDocument = function (id, collection) {
+  return firebase.firestore().collection(collection.toString()).doc(id).get();
 };
 
-let getFilteredCategories = function (filters, render) {
-  let query = firebase.firestore().collection('categories');
+let getFilteredDocuments = function (filters, collection, process) {
+  let query = firebase.firestore().collection(collection.toString());
 
   if (filters.count !== 'Any') {
     query = query.where('count', '==', filters.count);
@@ -40,53 +39,45 @@ let getFilteredCategories = function (filters, render) {
     query = query.where('name', '==', filters.name);
   }
 
-  this.getDocumentsInQuery(query, render);
+  getDocumentsInQuery(query, process);
 };
 
-let addTag = function (categoryID, tag) {
-  const collection = firebase.firestore().collection('categories');
-  const document = collection.doc(categoryID);
-  const newDocument = document.collection('tags').doc();
+let addDocument = function (collecxn, data) {
+  const newDocument = document.collection(collecxn).doc();
 
   return firebase.firestore().runTransaction((transaction) => {
-    return transaction.get(document).then((doc) => {
-      const data = doc.data();
-
-      transaction.update(document, {
-        test: 17,
-        result: true
-      });
-      return transaction.set(newDocument, tag);
-    });
+    return transaction.set(newDocument, data);
   });
 };
 
-let renderResults = function(doc) {
+let processDoc = function(doc) {
     if (!doc) {
-        console.log("renderResults got no doc.");
+        console.log("processDoc got no doc.");
         return;
     }
-    console.log("renderResults got doc.");
+    console.log("processDoc got doc.");
     var data = doc.data();
-    data['.id'] = doc.id;
     console.log(doc.id,":",data);
 }
 
 window.onload = function() {
-    firebase
+    /*firebase //WORKS!
     .firestore()
     .collection('categories')
-    .limit(1)
+    .limit(2)
     .onSnapshot(function(snapshot) {
         if (snapshot.empty) {
             console.log("Snapshot is empty.");
         } else {
             console.log("Snapshot is not empty.");
+            snapshot.forEach(function (doc) {
+                console.log(doc.id.toString(),":",doc.data());
+            })
         }
-    });
-    
-    getAllCategories(renderResults);
-
+    });*/
+    //console.log("HERE");
+    //getNDocuments('categories', 2, processDoc);
+    //console.log("HERE");
     let app;
     try {
         app = firebase.app();
@@ -98,13 +89,11 @@ window.onload = function() {
     };
     if (app) {
         var db = app.firestore();
-        var collection = db.collection("users");
-        collection.doc(user.id).get().then(function(docs) {
-            if (docs) {
-                console.log("Success:", docs.data());
-            } else {
-                console.log("Empty result.");
-            }
+        var collection = db.collection("categories");
+        collection.get().then(function(docs) {
+            docs.forEach(function(doc) {
+                console.log(doc.id, " => ", doc.data());
+            });
         }).catch(function(error) {
             console.log("Error executing query:", error);
         });
