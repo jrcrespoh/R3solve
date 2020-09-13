@@ -81,23 +81,18 @@ window.onload = function() {
     let app;
     try {
         app = firebase.app();
+        if (window.document.title == "R3solve") {
+            var db = app.firestore();
+            var collection = db.collection("categories");
+            collection.get().then(function(docs) {
+                docs.forEach(function(doc) {
+                    console.log(doc.id, " => ", doc.data());
+                });
+            }).catch(function(error) {
+                console.log("Error executing query:", error);
+            });
+        }
     } catch (e) {
         console.error(e);
-    }
-    let user = {
-        id: "3kvjG9Bjy1dQKWwA8Tzs"
-    };
-    if (app) {
-        var db = app.firestore();
-        var collection = db.collection("categories");
-        collection.get().then(function(docs) {
-            docs.forEach(function(doc) {
-                console.log(doc.id, " => ", doc.data());
-            });
-        }).catch(function(error) {
-            console.log("Error executing query:", error);
-        });
-    } else {
-        console.log("Something's wrong...");
     }
 };
