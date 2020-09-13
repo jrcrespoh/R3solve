@@ -1,0 +1,8 @@
+{
+  "name": "R3solve",
+  "short_name": "R3solve",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#84A3D0"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "R3solve",
+  "version": "0.0.1",
+  "description": "PennApps 2020 Hack",
+  "main": ".",
+  "scripts": {},
+  "author": "",
+  "devDependencies": {}
+}
