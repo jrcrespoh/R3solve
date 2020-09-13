@@ -84,10 +84,15 @@ window.onload = function() {
         if (window.document.title == "R3solve") {
             var db = app.firestore();
             var collection = db.collection("categories");
-            collection.get().then(function(docs) {
+            collection.limit(5).get().then(function(docs) {
+                let content = "";
                 docs.forEach(function(doc) {
                     console.log(doc.id, " => ", doc.data());
+                    content += '<a href="#" class="list-group-item list-group-item-action">'
+                    content += doc.data().name.toString();
+                    content += '</a>'
                 });
+                document.getElementById('top-problems').innerHTML = content;
             }).catch(function(error) {
                 console.log("Error executing query:", error);
             });
